@@ -239,7 +239,7 @@ int main( int argc, char **argv )
 	glutInitWindowSize( 750, 750 );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
-	glutCreateWindow( "Color Cube" );
+	glutCreateWindow( "Shh... God is talking" );
 	std::cout << "glut code done" << std::endl;
 
 	// glm::vec4 vec;
