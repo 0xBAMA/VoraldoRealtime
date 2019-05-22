@@ -26,30 +26,6 @@ const int NumVertices = 70000;
 point4 points[NumVertices];
 color4 colors[NumVertices];
 
-// // Vertices of a unit cube centered at origin, sides aligned with axes
-// point4 vertices[8] = {
-//     point4( -0.5, -0.5,  0.5, 1.0 ),
-//     point4( -0.5,  0.5,  0.5, 1.0 ),
-//     point4(  0.5,  0.5,  0.5, 1.0 ),
-//     point4(  0.5, -0.5,  0.5, 1.0 ),
-//     point4( -0.5, -0.5, -0.5, 1.0 ),
-//     point4( -0.5,  0.5, -0.5, 1.0 ),
-//     point4(  0.5,  0.5, -0.5, 1.0 ),
-//     point4(  0.5, -0.5, -0.5, 1.0 )
-// };
-//
-// // RGBA colors
-// color4 vertex_colors[8] = {
-//     color4( 0.0, 0.0, 0.0, 1.0 ),  // black
-//     color4( 1.0, 0.0, 0.0, 1.0 ),  // red
-//     color4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-//     color4( 0.0, 1.0, 0.0, 1.0 ),  // green
-//     color4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-//     color4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-//     color4( 1.0, 1.0, 1.0, 1.0 ),  // white
-//     color4( 0.0, 1.0, 1.0, 1.0 )   // cyan
-// };
-
 // Array of rotation angles (in degrees) for each coordinate axis
 enum { Xaxis = 0, Yaxis = 1, Zaxis = 2, NumAxes = 3 };
 int      Axis = Xaxis;
@@ -92,7 +68,7 @@ int Index = 0;
 void gencube()
 {
 	GLfloat num;
-	std::vector<GLfloat> range = {-0.5,-0.475,-0.45,-0.425,-0.4,-0.375,-0.35,-0.325,-0.3,-0.275,-0.25,-0.225,-0.2,-0.175,-0.15,-0.125,-0.1,-0.075,-0.05,-0.025,1.59595e-16,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5};
+	std::vector<GLfloat> range = {-0.5,-0.475,-0.45,-0.425,-0.4,-0.375,-0.35,-0.325,-0.3,-0.275,-0.25,-0.225,-0.2,-0.175,-0.15,-0.125,-0.1,-0.075,-0.05,-0.025,0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5};
 
 	for(const auto& x : range){
 		for(const auto& y : range){
@@ -101,7 +77,16 @@ void gencube()
 
 				//num = double(rand())/double(RAND_MAX);
 
-				colors[Index] = color4(x+0.5,y+0.5,z+0.5,0.25);
+				if ( x==0 || y==0 || z==0 ){
+					colors[Index] = color4(0.0,0.0,0.0,1.0);
+				}
+				else
+				{
+					// colors[Index] = color4(x+0.5,y+0.5,z+0.5,0.01);
+					colors[Index] = color4(0.0,0.0,0.3,0.1);
+
+				}
+
 				Index++;
 			}
 		}
@@ -141,25 +126,71 @@ init( Shader s )
 
 
     // set up vertex arrays
+
+		// vertex locations
     GLuint vPosition = glGetAttribLocation( s.Program, "vPosition" );
     glEnableVertexAttribArray( vPosition );
-    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,
-			  (GLvoid*) (0) );
+    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*) (0) );
 
 
-
+		// vertex colors
     GLuint vColor = glGetAttribLocation( s.Program, "vColor" );
     glEnableVertexAttribArray( vColor );
-    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0,
-			   (GLvoid*) (sizeof(points)) );
+    glVertexAttribPointer( vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*) (sizeof(points)) );
 
+
+		// uniform value for rotation
     theta = glGetUniformLocation( s.Program, "theta" );
 
+
+		// enable z buffer for occlusion
     glEnable( GL_DEPTH_TEST );
 
+
+		// alpha blending
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
+		// glBlendFunc(sfactor, dfactor); ?? this is going to require more research
+
+		// The enum values that are available for sfactor are as follows -
+
+		// GL_ZERO,
+    // GL_ONE,
+    // GL_SRC_COLOR,
+    // GL_ONE_MINUS_SRC_COLOR,
+    // GL_DST_COLOR,
+    // GL_ONE_MINUS_DST_COLOR,
+    // GL_SRC_ALPHA,
+    // GL_ONE_MINUS_SRC_ALPHA,
+    // GL_DST_ALPHA,
+    // GL_ONE_MINUS_DST_ALPHA,
+    // GL_CONSTANT_COLOR,
+    // GL_ONE_MINUS_CONSTANT_COLOR,
+    // GL_CONSTANT_ALPHA,
+    // GL_ONE_MINUS_CONSTANT_ALPHA,
+    // GL_SRC_ALPHA_SATURATE
+
+		// The enum values that are available for dfactor are as follows -
+
+		// GL_ZERO,
+    // GL_ONE,
+    // GL_SRC_COLOR,
+    // GL_ONE_MINUS_SRC_COLOR,
+    // GL_DST_COLOR,
+    // GL_ONE_MINUS_DST_COLOR,
+    // GL_SRC_ALPHA,
+    // GL_ONE_MINUS_SRC_ALPHA,
+    // GL_DST_ALPHA,
+    // GL_ONE_MINUS_DST_ALPHA,
+    // GL_CONSTANT_COLOR,
+    // GL_ONE_MINUS_CONSTANT_COLOR,
+    // GL_CONSTANT_ALPHA,
+    // GL_ONE_MINUS_CONSTANT_ALPHA
+
+
+		// what color background?
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 }
 
@@ -169,10 +200,13 @@ void
 display( void )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		// theShader.Use();
 
+		// update the value of theta in the shader
     glUniform3fv( theta, 1, Theta );
+
+		// the draw call
     glDrawArrays( GL_POINTS, 0, NumVertices );
+
 
     glutSwapBuffers();
 }
@@ -189,11 +223,11 @@ keyboard( unsigned char key, int x, int y )
 	    break;
 	case 'a':
 			pointsize += 1;
-			glPointSize(pointsize);
+			glPointSize( pointsize );
 			break;
   case 'z':
 			pointsize -= 1;
-			glPointSize(pointsize);
+			glPointSize( pointsize );
 			break;
     }
 }
@@ -203,12 +237,14 @@ keyboard( unsigned char key, int x, int y )
 void
 mouse( int button, int state, int x, int y )
 {
-    if ( state == GLUT_DOWN ) {
-	switch( button ) {
-	    case GLUT_LEFT_BUTTON:    Axis = Xaxis;  break;
-	    case GLUT_MIDDLE_BUTTON:  Axis = Yaxis;  break;
-	    case GLUT_RIGHT_BUTTON:   Axis = Zaxis;  break;
-	}
+    if ( state == GLUT_DOWN )
+		{
+			switch( button )
+			{
+			    case GLUT_LEFT_BUTTON:    Axis = Xaxis;  break;
+			    case GLUT_MIDDLE_BUTTON:  Axis = Yaxis;  break;
+			    case GLUT_RIGHT_BUTTON:   Axis = Zaxis;  break;
+			}
     }
 }
 
@@ -239,7 +275,7 @@ int main( int argc, char **argv )
 	glutInitWindowSize( 750, 750 );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
-	glutCreateWindow( "Shh... God is talking" );
+	glutCreateWindow( "Color Cube" );
 	std::cout << "glut code done" << std::endl;
 
 	// glm::vec4 vec;
