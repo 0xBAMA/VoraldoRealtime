@@ -31,7 +31,7 @@
 typedef glm::vec4  color4;
 typedef glm::vec4  point4;
 
-const int NumVertices = 70000;
+const int NumVertices = 700000;
 
 point4 points[NumVertices];
 color4 colors[NumVertices];
@@ -78,7 +78,8 @@ int Index = 0;
 void gencube()
 {
 	GLfloat num;
-	std::vector<GLfloat> range = {-0.5,-0.475,-0.45,-0.425,-0.4,-0.375,-0.35,-0.325,-0.3,-0.275,-0.25,-0.225,-0.2,-0.175,-0.15,-0.125,-0.1,-0.075,-0.05,-0.025,0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5};
+
+	std::vector<GLfloat> range = {-0.5,-0.48,-0.46,-0.44,-0.42,-0.4,-0.38,-0.36,-0.34,-0.32,-0.3,-0.28,-0.26,-0.24,-0.22,-0.2,-0.18,-0.16,-0.14,-0.12,-0.1,-0.08,-0.06,-0.04,-0.02,0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5};
 
 	PerlinNoise p;
 
@@ -97,12 +98,19 @@ void gencube()
 					// colors[Index] = color4(x+0.5,y+0.5,z+0.5,0.01);
 					// colors[Index] = color4(0.0,0.0,0.3,0.1);
 
-					float val = p.noise(10*x,10*y,10*z);
+					float val = p.noise( 10*x, 10*y, 10*z );
 					//float distance_to_zero = sqrt(pow(x2 - x1, 2) +  pow(y2 - y1, 2) +  pow(z2 - z1, 2) * 1.0);
 
-					float distance_to_zero = sqrt(pow(x - 0, 2) +  pow(y - 0, 2) +  pow(z - 0, 2) * 1.0);
+					float distance_to_zero = sqrt( pow(x - 0, 2) +  pow(y - 0, 2) +  pow(z - 0, 2) * 1.0 );
 
-					colors[Index] = color4(val,val,val,0.5-pow(distance_to_zero,2));
+
+					if( val < 0.3 ){
+						colors[Index] = color4( 0.0, 0.0, 1.0, 1.0 );
+
+					}else{
+						colors[Index] = color4( val, val, val, 0.5 - pow( distance_to_zero, 2 ) );
+
+					}
 
 
 				}

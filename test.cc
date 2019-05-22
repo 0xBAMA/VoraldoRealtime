@@ -1,5 +1,4 @@
 #include <iostream>
-#include "resources/perlin.h"
 
 //this file is just to produce lists of numbers, etc, or quickly testing other code
 
@@ -19,14 +18,10 @@ int main(){
 	//
 	// std:: cout << num_points;
 
-	for(double i = -0.5; i < 0.5; i += 0.025)
+	for(double i = -0.5; i < 0.5; i += 0.02)
 	{
 		std::cout << i << ",";
 	}
-
-	PerlinNoise p;
-
-	double d = p.noise(0.1,0.1,0.1);
 
 	return 0;
 }

@@ -1,9 +1,11 @@
 CC = g++
 
-MAKE_EXE=-o exe
+MAKE_EXE= -O2 -o exe -time
 
-LIBS = -lglut -lGLEW -lGL -lGLU
-FLAGS = -O2 -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++11 -time
+GL_FLAGS = -lglut -lGLEW -lGL -lGLU
+
+#this is only neccesary if compiling with Cimg
+#CIMG_FLAGS = -L/usr/X11R6/lib -lm -lpthread -lX11 -std=c++11
 
 all: main.cc
-	$(CC) main.cc  $(MAKE_EXE) $(LIBS) $(FLAGS)
+	$(CC) main.cc  $(MAKE_EXE) $(GL_FLAGS) #$(CIMG_FLAGS)
