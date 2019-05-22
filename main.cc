@@ -3,20 +3,30 @@
 #include <cstdlib>  //random number generation
 #include <vector>   //container
 
+#include <math.h>   //sqrt, pow
+
+
 // GLEW
 #define GLEW_STATIC
 #include <GL/glew.h>
+
 
 // GLUT
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 
+
 // Shader Compilation
-#include "Shader.h"
+#include "resources/shaders/Shader.h"
 
 
 // glsl-style Vector and Matrix Library
-#include "glm/glm.hpp"
+#include "resources/glm/glm.hpp"
+
+
+// Perlin noise - simple implementation from https://github.com/sol-prog/Perlin_Noise
+#include "resources/perlin.h"
+
 
 typedef glm::vec4  color4;
 typedef glm::vec4  point4;
@@ -70,6 +80,8 @@ void gencube()
 	GLfloat num;
 	std::vector<GLfloat> range = {-0.5,-0.475,-0.45,-0.425,-0.4,-0.375,-0.35,-0.325,-0.3,-0.275,-0.25,-0.225,-0.2,-0.175,-0.15,-0.125,-0.1,-0.075,-0.05,-0.025,0,0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5};
 
+	PerlinNoise p;
+
 	for(const auto& x : range){
 		for(const auto& y : range){
 			for(const auto& z : range){
@@ -83,7 +95,15 @@ void gencube()
 				else
 				{
 					// colors[Index] = color4(x+0.5,y+0.5,z+0.5,0.01);
-					colors[Index] = color4(0.0,0.0,0.3,0.1);
+					// colors[Index] = color4(0.0,0.0,0.3,0.1);
+
+					float val = p.noise(10*x,10*y,10*z);
+					//float distance_to_zero = sqrt(pow(x2 - x1, 2) +  pow(y2 - y1, 2) +  pow(z2 - z1, 2) * 1.0);
+
+					float distance_to_zero = sqrt(pow(x - 0, 2) +  pow(y - 0, 2) +  pow(z - 0, 2) * 1.0);
+
+					colors[Index] = color4(val,val,val,0.5-pow(distance_to_zero,2));
+
 
 				}
 
@@ -290,7 +310,7 @@ int main( int argc, char **argv )
   glewInit();
 
 
-	Shader theShader( "shaders/vertex.glsl", "shaders/fragment.glsl" );
+	Shader theShader( "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl" );
 	std::cout << "Shader compilation finished" << std::endl;
 
 	std::cout << "Initializing" << std::endl;
