@@ -25,7 +25,7 @@
 #include "resources/CImg.h"
 
 
-// glsl-style Vector and Matrix Library
+// glsl-style Vector and Matrix Library - separate includes for different functionality
 #include "resources/glm/glm.hpp" //general types
 #include "resources/glm/gtc/matrix_transform.hpp" //orthographic view matrix (glm::ortho( left, right, bottom, top, zNear, zFar ))
 #include "resources/glm/gtc/type_ptr.hpp" //allows the sending of a matrix (weird workaround for glUniform...)
