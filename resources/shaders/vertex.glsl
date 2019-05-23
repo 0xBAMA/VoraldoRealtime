@@ -6,6 +6,8 @@ out vec4 color;
 
 uniform vec3 theta;
 
+uniform mat4 view;
+
 void main()
 {
     // Compute the sines and cosines of theta for each of
@@ -40,5 +42,5 @@ void main()
     color = vColor;
 
 
-    gl_Position = rz * ry * rx * vPosition;
+    gl_Position = view * rz * ry * rx * vPosition;
 }

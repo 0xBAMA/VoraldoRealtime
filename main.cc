@@ -26,7 +26,9 @@
 
 
 // glsl-style Vector and Matrix Library
-#include "resources/glm/glm.hpp"
+#include "resources/glm/glm.hpp" //general types
+#include "resources/glm/gtc/matrix_transform.hpp" //orthographic view matrix
+#include "resources/glm/gtc/type_ptr.hpp" //allows the sending of a matrix
 
 
 // Perlin noise - simple implementation from https://github.com/sol-prog/Perlin_Noise
@@ -34,7 +36,7 @@
 
 
 
-// don't really need this
+// don't really need this, it's really just for convenience
 typedef glm::vec4  color4;
 typedef glm::vec4  point4;
 
@@ -58,7 +60,11 @@ color4 colors[NumVertices];
 enum { Xaxis = 0, Yaxis = 1, Zaxis = 2, NumAxes = 3 };
 int      Axis = Xaxis;
 GLfloat  Theta[NumAxes] = { 0.0, 0.0, 0.0 };
+
 GLuint  theta;  // The location of the "theta" shader uniform variable
+GLuint  ortho_matrix;
+
+glm::mat4 Projection;
 
 bool rotate = true;
 
@@ -164,7 +170,6 @@ void gencube()
 		}
 	}
 
-	std::cout << "gencube produced " << Index << " points" << std::endl;
 	//done
 }
 
@@ -211,7 +216,12 @@ void init( Shader s )
 
 		// uniform value for rotation
     theta = glGetUniformLocation( s.Program, "theta" );
+		ortho_matrix = glGetUniformLocation( s.Program, "view" );
 
+
+		Projection = glm::ortho(-1.366f, 1.366f, -0.768f, 0.768f, -1.0f, 1.0f);
+
+		glUniformMatrix4fv( ortho_matrix, 1, GL_FALSE,  glm::value_ptr( Projection ) );
 
 		// enable z buffer for occlusion
     glEnable( GL_DEPTH_TEST );
@@ -267,11 +277,12 @@ void init( Shader s )
 
 void screenshot( )
 {
-	// unsigned char buffer, holds framebuffer contents
-	unsigned char * r_pixel_buffer = new unsigned char[image_width * image_height];
-	unsigned char * g_pixel_buffer = new unsigned char[image_width * image_height];
-	unsigned char * b_pixel_buffer = new unsigned char[image_width * image_height];
+	int num_pixels = image_width * image_height;
 
+	// unsigned char buffer, holds framebuffer contents
+	unsigned char * r_pixel_buffer = new unsigned char[num_pixels];
+	unsigned char * g_pixel_buffer = new unsigned char[num_pixels];
+	unsigned char * b_pixel_buffer = new unsigned char[num_pixels];
 
 	// get the image data from OpenGL
 	glReadPixels( 0, 0, image_width, image_height, 	 GL_RED, GL_UNSIGNED_BYTE, r_pixel_buffer );
@@ -281,21 +292,17 @@ void screenshot( )
 	// From https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glReadPixels.xhtml :
 	// "Pixels are returned in row order from the lowest to the highest row, left to right in each row."
 
-	// this looks like row 0, row 1, row 2... going from bottom to top
-	// each row looks like column 1, column 2, column 3... going from left to right
-
 	// create an image
 	cimg_library::CImg<unsigned char> img( image_width, image_height, 1, 3, 0 );
-
 
 	// load pixel data into the images, and draw
 	unsigned char image_color[3]; // holds the value of the current pixel's color
 
 	int x = 0;
-	int y = image_height-2;
+	int y = image_height;
 
-	for( int index = 0; index < image_width * image_height; index++ ){
-
+	for( int index = 0; index < num_pixels; index++ )
+	{
 		image_color[0] = r_pixel_buffer[index];
 		image_color[1] = g_pixel_buffer[index];
 		image_color[2] = b_pixel_buffer[index];
@@ -430,39 +437,39 @@ void idle( void )
 //  /  \ /  \  /  /_\  \|   |/   |   \
 // /    Y    \/    |    \   /    |    \
 // \____|__  /\____|__  /___\____|__  /
-// 		    \/         \/            \/
+// 		     \/         \/            \/
 
 
 int main( int argc, char **argv )
 {
-	std::cout << "very first thing" << std::endl;
+
+	std::cout << "GLUT Initializing...";
+
 	glutInit( &argc, argv );
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 	glutInitWindowSize( image_width, image_height );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
 	glutCreateWindow( "Color Cube" );
-	std::cout << "glut code done" << std::endl;
+	glutFullScreen();
 
-	// glm::vec4 vec;
-	//
-	// usleep(9000000);
-	//
-	// std::cout << "gottem" << std::endl;
-
+	std::cout << "\rGLUT Initialization Complete." << std::endl;
 
 
 	glewExperimental = GL_TRUE;
   glewInit();
 
+	std::cout << "Shader Compilation Starting...";
 
 	Shader theShader( "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl" );
-	std::cout << "Shader compilation finished" << std::endl;
+	std::cout << "\rShader Compilation Complete.  " << std::endl;
 
-	std::cout << "Initializing" << std::endl;
-
+	std::cout << "Generating Geometry";
 
   init( theShader );
+
+	std::cout << "\rInitialization done." << std::endl;
+	std::cout << "gencube() produced " << Index << " points" << std::endl;
 
   glutDisplayFunc( display );
   glutKeyboardFunc( keyboard );

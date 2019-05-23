@@ -11,9 +11,11 @@ int main(){
 	const unsigned char dark_gold[3] = {127,107,0};
 
 
-	img.draw_point( 0, 0,dark_gold);
-	img.draw_point(20,20,dark_gold);
-	img.draw_point(99,99,dark_gold);
+	img.draw_point(  0,  0, dark_gold);
+	img.draw_point( 20, 20, dark_gold);
+	img.draw_point( 99, 99, dark_gold);
+	img.draw_point(100,100, dark_gold);
+
 
 	img.save_png("test.png");
 
