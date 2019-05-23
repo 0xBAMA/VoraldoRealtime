@@ -27,8 +27,8 @@
 
 // glsl-style Vector and Matrix Library
 #include "resources/glm/glm.hpp" //general types
-#include "resources/glm/gtc/matrix_transform.hpp" //orthographic view matrix
-#include "resources/glm/gtc/type_ptr.hpp" //allows the sending of a matrix
+#include "resources/glm/gtc/matrix_transform.hpp" //orthographic view matrix (glm::ortho( left, right, bottom, top, zNear, zFar ))
+#include "resources/glm/gtc/type_ptr.hpp" //allows the sending of a matrix (weird workaround for glUniform...)
 
 
 // Perlin noise - simple implementation from https://github.com/sol-prog/Perlin_Noise
@@ -67,6 +67,7 @@ GLuint  ortho_matrix;
 glm::mat4 Projection;
 
 bool rotate = true;
+bool rotation_direction = true;
 
 
 //initial value of point size
@@ -216,7 +217,7 @@ void init( Shader s )
 
 		// uniform value for rotation
     theta = glGetUniformLocation( s.Program, "theta" );
-		ortho_matrix = glGetUniformLocation( s.Program, "view" );
+		ortho_matrix = glGetUniformLocation( s.Program, "view" ); //allows the scaling to the screen dimensions`
 
 
 		Projection = glm::ortho(-1.366f, 1.366f, -0.768f, 0.768f, -1.0f, 1.0f);
@@ -379,6 +380,11 @@ void keyboard( unsigned char key, int x, int y )
 					rotate = rotate ? false : true;
 					break;
 
+			// change direction of rotation
+			case 't':
+					rotation_direction = rotation_direction ? false : true;
+					break;
+
 			// resize points
 			case 'a':
 					pointsize += 1;
@@ -417,12 +423,19 @@ void idle( void )
 {
 
 		if( rotate ){
+			if( rotation_direction ){
+				Theta[Axis] += 0.1;
 
-			Theta[Axis] += 0.1;
+				if ( Theta[Axis] > 360.0 ) {
+						Theta[Axis] -= 360.0;
+				}
+			}else{ //rotate the other way
+				Theta[Axis] -= 0.1;
 
-	    if ( Theta[Axis] > 360.0 ) {
-					Theta[Axis] -= 360.0;
-	    }
+				if ( Theta[Axis] < 0.0 ) {
+						Theta[Axis] += 360.0;
+				}
+			}
 		}
 
     glutPostRedisplay();
