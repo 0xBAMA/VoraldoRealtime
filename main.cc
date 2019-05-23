@@ -274,15 +274,15 @@ void screenshot( )
 
 
 	// get the image data from OpenGL
-	glReadPixels( 0, 0, image_width, image_height, GL_RED, GL_UNSIGNED_BYTE, r_pixel_buffer );
+	glReadPixels( 0, 0, image_width, image_height, 	 GL_RED, GL_UNSIGNED_BYTE, r_pixel_buffer );
 	glReadPixels( 0, 0, image_width, image_height, GL_GREEN, GL_UNSIGNED_BYTE, g_pixel_buffer );
-	glReadPixels( 0, 0, image_width, image_height, GL_BLUE, GL_UNSIGNED_BYTE, b_pixel_buffer );
+	glReadPixels( 0, 0, image_width, image_height,  GL_BLUE, GL_UNSIGNED_BYTE, b_pixel_buffer );
 
 	// From https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glReadPixels.xhtml :
 	// "Pixels are returned in row order from the lowest to the highest row, left to right in each row."
 
-	// this looks like row 0, row 1, row 2...
-	// each row looks like column 1, column 2, column 3...
+	// this looks like row 0, row 1, row 2... going from bottom to top
+	// each row looks like column 1, column 2, column 3... going from left to right
 
 	// create an image
 	cimg_library::CImg<unsigned char> img( image_width, image_height, 1, 3, 0 );
@@ -291,19 +291,20 @@ void screenshot( )
 	// load pixel data into the images, and draw
 	unsigned char image_color[3]; // holds the value of the current pixel's color
 
-	// const unsigned char dark_gold[3] = {127,107,0};// test color
-
 	int x = 0;
 	int y = image_height-2;
 
 	for( int index = 0; index < image_width * image_height; index++ ){
 
-		//CImg numbers from top row ( 0 ) to bottom row ( image_height - 1 )
-		//OpenGL numbers from bottom row ( image_height - 1 ) to top row ( 0 )
-
 		image_color[0] = r_pixel_buffer[index];
 		image_color[1] = g_pixel_buffer[index];
 		image_color[2] = b_pixel_buffer[index];
+
+		//std::cout << (unsigned int) (image_color[0]) << " " 					// r value
+		//					<< (unsigned int) (image_color[1]) << " " 					// g value
+		//					<< (unsigned int) (image_color[2]) << " " 					// b value
+		//					<< x << " " << y << " " 														// x and y values (output pixel)
+		//					<< image_width*image_height - index << std::endl;		// how many entries left?
 
 		img.draw_point( x, y, image_color);
 
@@ -312,6 +313,8 @@ void screenshot( )
 		if(x == image_width + 2){
 			x = 0;
 			y--;
+
+			std::cout << index << std::endl;
 		}
 	}
 
@@ -321,9 +324,9 @@ void screenshot( )
 
 	// done
 
-	delete(r_pixel_buffer);
-	delete(g_pixel_buffer);
-	delete(b_pixel_buffer);
+	delete[] r_pixel_buffer;
+	delete[] g_pixel_buffer;
+	delete[] b_pixel_buffer;
 
 }
 
