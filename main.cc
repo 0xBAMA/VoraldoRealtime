@@ -1,3 +1,4 @@
+// basic libraries
 #include <iostream> //terminal I/O
 #include <unistd.h> //sleep
 #include <cstdlib>  //random number generation
@@ -20,6 +21,10 @@
 #include "resources/shaders/Shader.h"
 
 
+// CImg Image library
+#include "resources/CImg.h"
+
+
 // glsl-style Vector and Matrix Library
 #include "resources/glm/glm.hpp"
 
@@ -28,28 +33,46 @@
 #include "resources/perlin.h"
 
 
+
+// don't really need this
 typedef glm::vec4  color4;
 typedef glm::vec4  point4;
 
+
+
+// image dimensions, based on laptop screen resolution
+const int image_height = 768;
+const int image_width = 1366;
+
+
+// verticies
 const int NumVertices = 700000;
 
 point4 points[NumVertices];
 color4 colors[NumVertices];
 
+
+
+
 // Array of rotation angles (in degrees) for each coordinate axis
 enum { Xaxis = 0, Yaxis = 1, Zaxis = 2, NumAxes = 3 };
 int      Axis = Xaxis;
 GLfloat  Theta[NumAxes] = { 0.0, 0.0, 0.0 };
+GLuint  theta;  // The location of the "theta" shader uniform variable
 
+bool rotate = true;
+
+
+//initial value of point size
 GLfloat pointsize = 1.0;
 
-GLuint  theta;  // The location of the "theta" shader uniform variable
+
 
 //----------------------------------------------------------------------------
 
 // // quad generates two triangles for each face and assigns colors
 // //    to the vertices
-int Index = 0;
+
 // void
 // quad( int a, int b, int c, int d )
 // {
@@ -74,6 +97,18 @@ int Index = 0;
 //     quad( 4, 5, 6, 7 );
 //     quad( 5, 4, 0, 1 );
 // }
+
+
+// .___ _______  .______________
+// |   |\      \ |   \__    ___/
+// |   |/   |   \|   | |    |
+// |   /    |    \   | |    |
+// |___\____|__  /___| |____|
+//             \/
+
+//----------------------------------------------------------------------------
+
+int Index = 0; //tracks the number of points generated
 
 void gencube()
 {
@@ -104,12 +139,21 @@ void gencube()
 					float distance_to_zero = sqrt( pow(x - 0, 2) +  pow(y - 0, 2) +  pow(z - 0, 2) * 1.0 );
 
 
-					if( val < 0.3 ){
-						colors[Index] = color4( 0.0, 0.0, 1.0, 1.0 );
-
-					}else{
+					if( val < 0.3 )
+					{
+						colors[Index] = color4( 0.0, 0.0, 1.0, 3.0 );
+					}
+					else if( val > 0.8 )
+					{
+						colors[Index] = color4( 1.0, 0.0, 0.0, 3.0 );
+					}
+					else
+					{
 						colors[Index] = color4( val, val, val, 0.5 - pow( distance_to_zero, 2 ) );
+					}
 
+					if(x == 0.5){
+						colors[Index] = color4(0.0,1.0,1.0,1.0);
 					}
 
 
@@ -120,15 +164,14 @@ void gencube()
 		}
 	}
 
-	std::cout << Index;
+	std::cout << "gencube produced " << Index << " points" << std::endl;
 	//done
 }
 
-//----------------------------------------------------------------------------
+
 
 // OpenGL initialization
-void
-init( Shader s )
+void init( Shader s )
 {
     // colorcube();
 
@@ -143,8 +186,7 @@ init( Shader s )
     GLuint buffer;
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),
-		  NULL, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors), NULL, GL_STATIC_DRAW );
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(points), points );
     glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
 
@@ -222,10 +264,80 @@ init( Shader s )
     glClearColor( 1.0, 1.0, 1.0, 1.0 );
 }
 
+
+void screenshot( )
+{
+	// unsigned char buffer, holds framebuffer contents
+	unsigned char * r_pixel_buffer = new unsigned char[image_width * image_height];
+	unsigned char * g_pixel_buffer = new unsigned char[image_width * image_height];
+	unsigned char * b_pixel_buffer = new unsigned char[image_width * image_height];
+
+
+	// get the image data from OpenGL
+	glReadPixels( 0, 0, image_width, image_height, GL_RED, GL_UNSIGNED_BYTE, r_pixel_buffer );
+	glReadPixels( 0, 0, image_width, image_height, GL_GREEN, GL_UNSIGNED_BYTE, g_pixel_buffer );
+	glReadPixels( 0, 0, image_width, image_height, GL_BLUE, GL_UNSIGNED_BYTE, b_pixel_buffer );
+
+	// From https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glReadPixels.xhtml :
+	// "Pixels are returned in row order from the lowest to the highest row, left to right in each row."
+
+	// this looks like row 0, row 1, row 2...
+	// each row looks like column 1, column 2, column 3...
+
+	// create an image
+	cimg_library::CImg<unsigned char> img( image_width, image_height, 1, 3, 0 );
+
+
+	// load pixel data into the images, and draw
+	unsigned char image_color[3]; // holds the value of the current pixel's color
+
+	// const unsigned char dark_gold[3] = {127,107,0};// test color
+
+	int x = 0;
+	int y = image_height-2;
+
+	for( int index = 0; index < image_width * image_height; index++ ){
+
+		//CImg numbers from top row ( 0 ) to bottom row ( image_height - 1 )
+		//OpenGL numbers from bottom row ( image_height - 1 ) to top row ( 0 )
+
+		image_color[0] = r_pixel_buffer[index];
+		image_color[1] = g_pixel_buffer[index];
+		image_color[2] = b_pixel_buffer[index];
+
+		img.draw_point( x, y, image_color);
+
+		x++;
+
+		if(x == image_width + 2){
+			x = 0;
+			y--;
+		}
+	}
+
+	// save the image as screenshot.png, don't worry about overwriting right now
+	img.save_png("screenshot.png");
+
+
+	// done
+
+	delete(r_pixel_buffer);
+	delete(g_pixel_buffer);
+	delete(b_pixel_buffer);
+
+}
+
+
+//   ________.____     ____ ______________
+//  /  _____/|    |   |    |   \__    ___/
+// /   \  ___|    |   |    |   / |    |
+// \    \_\  \    |___|    |  /  |    |
+//  \______  /_______ \______/   |____|
+// 	    	 \/        \/
+
 //----------------------------------------------------------------------------
 
-void
-display( void )
+void display( void )
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -241,29 +353,42 @@ display( void )
 
 //----------------------------------------------------------------------------
 
-void
-keyboard( unsigned char key, int x, int y )
+void keyboard( unsigned char key, int x, int y )
 {
-    switch( key ) {
-	case 033: // Escape Key
-	case 'q': case 'Q':
-	    exit( EXIT_SUCCESS );
-	    break;
-	case 'a':
-			pointsize += 1;
-			glPointSize( pointsize );
-			break;
-  case 'z':
-			pointsize -= 1;
-			glPointSize( pointsize );
-			break;
+    switch( key )
+		{
+			// quit
+			case 033: // Escape Key
+			case 'q': case 'Q':
+			    exit( EXIT_SUCCESS );
+			    break;
+
+			// toggle rotation
+			case 'r':
+					//condition ? result_if_true : result_if_false
+					rotate = rotate ? false : true;
+					break;
+
+			// resize points
+			case 'a':
+					pointsize += 1;
+					glPointSize( pointsize );
+					break;
+		  case 'z':
+					pointsize -= 1;
+					glPointSize( pointsize );
+					break;
+
+		  // take screnshot
+			case ' ':
+					screenshot( );
+					break;
     }
 }
 
 //----------------------------------------------------------------------------
 
-void
-mouse( int button, int state, int x, int y )
+void mouse( int button, int state, int x, int y )
 {
     if ( state == GLUT_DOWN )
 		{
@@ -278,14 +403,17 @@ mouse( int button, int state, int x, int y )
 
 //----------------------------------------------------------------------------
 
-void
-idle( void )
+void idle( void )
 {
-    Theta[Axis] += 0.1;
 
-    if ( Theta[Axis] > 360.0 ) {
-				Theta[Axis] -= 360.0;
-    }
+		if( rotate ){
+
+			Theta[Axis] += 0.1;
+
+	    if ( Theta[Axis] > 360.0 ) {
+					Theta[Axis] -= 360.0;
+	    }
+		}
 
     glutPostRedisplay();
 }
@@ -294,13 +422,20 @@ idle( void )
 
 
 
+//    _____      _____  .___ _______
+//   /     \    /  _  \ |   |\      \
+//  /  \ /  \  /  /_\  \|   |/   |   \
+// /    Y    \/    |    \   /    |    \
+// \____|__  /\____|__  /___\____|__  /
+// 		    \/         \/            \/
+
 
 int main( int argc, char **argv )
 {
 	std::cout << "very first thing" << std::endl;
 	glutInit( &argc, argv );
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-	glutInitWindowSize( 750, 750 );
+	glutInitWindowSize( image_width, image_height );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
 	glutCreateWindow( "Color Cube" );
