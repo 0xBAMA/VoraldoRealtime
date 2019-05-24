@@ -1,23 +1,25 @@
 #include <iostream>
 
-#include "resources/CImg.h"
+//#include "resources/CImg.h"
 
 //this file is just to produce lists of numbers, etc, or quickly testing other code
 
 int main(){
 
-	cimg_library::CImg<unsigned char> img( 100, 100, 1, 3, 0 );
+	// cimg_library::CImg<unsigned char> img( 100, 100, 1, 3, 0 );
+	//
+	// const unsigned char dark_gold[3] = {127,107,0};
+	//
+	//
+	// img.draw_point(  0,  0, dark_gold);
+	// img.draw_point( 20, 20, dark_gold);
+	// img.draw_point( 99, 99, dark_gold);
+	// img.draw_point(100,100, dark_gold);
+	//
+	//
+	// img.save_png("test.png");
 
-	const unsigned char dark_gold[3] = {127,107,0};
 
-
-	img.draw_point(  0,  0, dark_gold);
-	img.draw_point( 20, 20, dark_gold);
-	img.draw_point( 99, 99, dark_gold);
-	img.draw_point(100,100, dark_gold);
-
-
-	img.save_png("test.png");
 
 	// int num_points = 0;
 	//
@@ -33,10 +35,10 @@ int main(){
 	//
 	// std:: cout << num_points;
 
-	// for(double i = -0.5; i < 0.5; i += 0.02)
-	// {
-	// 	std::cout << i << ",";
-	// }
+	for(double i = -0.5; i < 0.5; i += 0.01)
+	{
+		std::cout << i << ",";
+	}
 
 	return 0;
 }
