@@ -35,7 +35,10 @@ int main(){
 	//
 	// std:: cout << num_points;
 
-	for(double i = -0.5; i < 0.5; i += 0.01)
+	double inc = 1.0f/395.0f; std::cout << inc << std::endl << std::endl;
+
+
+	for(double i = -0.5; i < 0.5; i += inc)
 	{
 		std::cout << i << ",";
 	}
