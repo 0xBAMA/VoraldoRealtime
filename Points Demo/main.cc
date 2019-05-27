@@ -584,7 +584,7 @@ int main( int argc, char **argv )
 
 	std::cout << "Shader Compilation Starting...";
 
-	Shader theShader( "../resources/shaders/vertex.glsl", "../resources/shaders/fragment.glsl" );
+	Shader theShader( "../resources/shaders/vertex_points.glsl", "../resources/shaders/fragment_points.glsl" );
 	std::cout << "\rShader Compilation Complete.  " << std::endl;
 
 	std::cout << "Generating Geometry";
