@@ -186,35 +186,6 @@ using namespace jb_OpenGL_Laptop;
 //using namespace jb_OpenGL_Radeon;
 
 
-//----------------------------------------------------------------------------
-
-// // quad generates two triangles for each face and assigns colors
-// //    to the vertices
-
-// void
-// quad( int a, int b, int c, int d )
-// {
-//     colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-//     colors[Index] = vertex_colors[b]; points[Index] = vertices[b]; Index++;
-//     colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-//     colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
-//     colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
-//     colors[Index] = vertex_colors[d]; points[Index] = vertices[d]; Index++;
-// }
-//
-// //----------------------------------------------------------------------------
-//
-// // generate 12 triangles: 36 vertices and 36 colors
-// void
-// colorcube()
-// {
-//     quad( 1, 0, 3, 2 );
-//     quad( 2, 3, 7, 6 );
-//     quad( 3, 0, 4, 7 );
-//     quad( 6, 5, 1, 2 );
-//     quad( 4, 5, 6, 7 );
-//     quad( 5, 4, 0, 1 );
-// }
 
 
 // .___ _______  .______________
@@ -237,7 +208,7 @@ void generate_points()
 	{
 		for ( GLfloat y = -0.5; y <= 0.5; y += 0.01)
 		{
-			for( GLfloat z = -0.1; z <= 0.1; z += 0.01)
+			for( GLfloat z = -0.5; z <= 0.5; z += 0.01)
 				if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
 				{
 
@@ -286,27 +257,36 @@ void init( Shader s )
 {
 
 
+		// enable z buffer for occlusion
+		glEnable( GL_DEPTH_TEST );
+		glEnable( GL_TEXTURE_3D );
+
+
+		// alpha blending
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 
 
 		glGenTextures(1, &texture); // Generate an ID
-		glBindTexture(GL_TEXTURE_2D, texture); // use the specified ID
+		glBindTexture(GL_TEXTURE_3D, texture); // use the specified ID
 
 		// set the texture wrapping/filtering options (on the currently bound texture object)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
 
 		// load and generate the texture
 		int width, height, nrChannels;
-		unsigned char *data = stbi_load("e.png", &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load("t.png", &width, &height, &nrChannels, 0);
 		if (data)
 		{
-		    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		    glGenerateMipmap(GL_TEXTURE_2D);
+		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		    glGenerateMipmap(GL_TEXTURE_3D);
 		}
 		else
 		{
@@ -354,14 +334,6 @@ void init( Shader s )
 		cout << sizeof( points );
 
 
-		// texture handling
-
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-
-
 		// uniform value for rotation
     theta = glGetUniformLocation( s.Program, "theta" );
 		ortho_matrix = glGetUniformLocation( s.Program, "view" ); //allows the scaling to the screen dimensions`
@@ -371,14 +343,7 @@ void init( Shader s )
 
 		glUniformMatrix4fv( ortho_matrix, 1, GL_FALSE,  glm::value_ptr( Projection ) );
 
-		// enable z buffer for occlusion
-    glEnable( GL_DEPTH_TEST );
-		glEnable( GL_TEXTURE_3D );
 
-
-		// alpha blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 		// what color background?
@@ -565,7 +530,7 @@ int main( int argc, char **argv )
 	glutInitWindowSize( image_width, image_height );
 	glutInitContextVersion( 3, 2 );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
-	glutCreateWindow( "Color Cube" );
+	glutCreateWindow( "GLUT Window" );
 	glutFullScreen();
 
 	std::cout << "\rGLUT Initialization Complete." << std::endl;
@@ -574,12 +539,12 @@ int main( int argc, char **argv )
 	glewExperimental = GL_TRUE;
   glewInit();
 
-
+	cout << "OpenGL Context established, version is: " << glGetString(GL_VERSION) << endl;
 
 
 	std::cout << "Shader Compilation Starting...";
 
-	Shader theShader( "../resources/shaders/vertex_textures.glsl", "../resources/shaders/fragment_textures.glsl" );
+	Shader theShader( "../resources/shaders/vertex_textures3d.glsl", "../resources/shaders/fragment_textures3d.glsl" );
 
 	std::cout << "\rShader Compilation Complete.  " << std::endl;
 
