@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 
 in  vec4 vPosition;
 in  vec4 vColor;
@@ -44,7 +44,7 @@ void main()
     color = vColor;
 
 
-    TexCoord = vec3( 0.5 * (vPosition.x + 1.0), 2 * (vPosition.y + 0.25), 2 *(vPosition.z + 0.25));
+    TexCoord = vec3( 0.5 * (vPosition.x + 1.0), 1 * (vPosition.y + 0.5), 1 *(vPosition.z + 0.5));
 
     gl_Position = view * rz * ry * rx * vPosition;
 }

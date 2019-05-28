@@ -204,11 +204,11 @@ void generate_points()
 
 	PerlinNoise p;
 
-	for( GLfloat x = -1.0; x <= 1.0 ; x += 0.009 )
+	for( GLfloat x = -1.0; x <= 1.0 ; x += 0.01 )
 	{
-		for ( GLfloat y = -0.25; y <= 0.25; y += 0.009 )
+		for ( GLfloat y = -0.5; y <= 0.5; y += 0.01 )
 		{
-			for( GLfloat z = -0.25; z <= 0.25; z += 0.009 )
+			for( GLfloat z = -0.5; z <= 0.5; z += 0.01 )
 
 			//	if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
 				{
@@ -227,15 +227,15 @@ void generate_points()
 		}
 	}
 
-	for( GLfloat step = -0.3; step <= 0.3; step += 0.01)
-	{
-		points[Index] = point4( 0.0, 0.0,   step, 1.0);
-		colors[Index] = color4( 0.0, 0.0, 0.0, 1.0);
-
-
-		Index++;
-
-	}
+	// for( GLfloat step = -0.3; step <= 0.3; step += 0.01)
+	// {
+	// 	points[Index] = point4( 0.0, 0.0,   step, 1.0);
+	// 	colors[Index] = color4( 0.0, 0.0, 0.0, 1.0);
+	//
+	//
+	// 	Index++;
+	//
+	// }
 
 
 	cout << Index << endl;
@@ -278,23 +278,26 @@ void init( Shader s )
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
 
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
 
 		// load and generate the texture
 		int width, height, nrChannels;
-		unsigned char *data = stbi_load("ship.png", &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load("big grid.png", &width, &height, &nrChannels, 0);
 		if (data)
 		{
-		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 256, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 256, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		    glGenerateMipmap(GL_TEXTURE_3D);
 		}
 		else
 		{
 		    std::cout << "Failed to load texture" << std::endl;
-		} 
+		}
 		stbi_image_free(data);
 
 
