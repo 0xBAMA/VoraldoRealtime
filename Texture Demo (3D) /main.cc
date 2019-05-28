@@ -204,11 +204,11 @@ void generate_points()
 
 	PerlinNoise p;
 
-	for( GLfloat x = -0.5; x <= 0.5 ; x += 0.01 )
+	for( GLfloat x = -1.0; x <= 1.0 ; x += 0.009 )
 	{
-		for ( GLfloat y = -0.5; y <= 0.5; y += 0.01)
+		for ( GLfloat y = -0.25; y <= 0.25; y += 0.009 )
 		{
-			for( GLfloat z = -0.5; z <= 0.5; z += 0.01)
+			for( GLfloat z = -0.25; z <= 0.25; z += 0.009 )
 
 			//	if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
 				{
@@ -227,7 +227,7 @@ void generate_points()
 		}
 	}
 
-	for( GLfloat step = 0.0; step <= 0.3; step += 0.01)
+	for( GLfloat step = -0.3; step <= 0.3; step += 0.01)
 	{
 		points[Index] = point4( 0.0, 0.0,   step, 1.0);
 		colors[Index] = color4( 0.0, 0.0, 0.0, 1.0);
