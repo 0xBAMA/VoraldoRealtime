@@ -209,7 +209,8 @@ void generate_points()
 		for ( GLfloat y = -0.5; y <= 0.5; y += 0.01)
 		{
 			for( GLfloat z = -0.5; z <= 0.5; z += 0.01)
-				if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
+
+			//	if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
 				{
 
 					// the x and y values here will be used as texture coordinates, taking advantage of wrapping
@@ -275,6 +276,8 @@ void init( Shader s )
 		// set the texture wrapping/filtering options (on the currently bound texture object)
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
+
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -282,10 +285,10 @@ void init( Shader s )
 
 		// load and generate the texture
 		int width, height, nrChannels;
-		unsigned char *data = stbi_load("t.png", &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load("ship.png", &width, &height, &nrChannels, 0);
 		if (data)
 		{
-		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 256, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		    glGenerateMipmap(GL_TEXTURE_3D);
 		}
 		else
@@ -347,7 +350,7 @@ void init( Shader s )
 
 
 		// what color background?
-    glClearColor( 1.0, 1.0, 1.0, 1.0 );
+    glClearColor( 0.618, 0.618, 0.618, 1.0 );
 }
 
 
