@@ -1,8 +1,10 @@
-#version 150
+#version 330 core
 
 in  vec4 vPosition;
 in  vec4 vColor;
 out vec4 color;
+
+out vec2 TexCoord;
 
 uniform vec3 theta;
 
@@ -41,6 +43,8 @@ void main()
 
     color = vColor;
 
+
+    TexCoord = vec2( 1 * (vPosition.x + 0.5), 1 * (vPosition.y + 0.5));
 
     gl_Position = view * rz * ry * rx * vPosition;
 }

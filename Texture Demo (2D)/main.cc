@@ -237,25 +237,36 @@ void generate_points()
 	{
 		for ( GLfloat y = -0.5; y <= 0.5; y += 0.01)
 		{
-			if( p.noise( 10*x, 10*y, 0.0 ) > 0.5 && p.noise( 10*x, 10*y, 0.0 ) < 0.75)
-			{
+			for( GLfloat z = -0.1; z <= 0.1; z += 0.01)
+				if( p.noise( 10*x, 10*y, 10*z ) > 0.5 && p.noise( 10*x, 10*y, 10*z ) < 0.75)
+				{
 
-				// the x and y values here will be used as texture coordinates, taking advantage of wrapping
-				points[Index] = point4( x, y, 0.0, 1.0);
-
-
-				colors[Index] = color4( p.noise( 10*x, 10*y, 0.0 ), 0.7*p.noise( 10*x, 10*y, 0.0 ), 0.3*p.noise( 10*x, 10*y, 0.0 ), p.noise( 10*x, 10*y, 0.0 ));
+					// the x and y values here will be used as texture coordinates, taking advantage of wrapping
+					points[Index] = point4( x, y, z, 1.0);
 
 
-				cout << Index << endl;
+					colors[Index] = color4( p.noise( 10*x, 10*y, 10*z ), 0.7*p.noise( 10*x, 10*y, 10*z ), 0.3*p.noise( 10*x, 10*y, 10*z ), p.noise( 10*x, 10*y, 10*z ));
 
-				Index++;
 
-			}
+
+					Index++;
+
+				}
 		}
 	}
 
+	for( GLfloat step = 0.0; step <= 0.3; step += 0.01)
+	{
+		points[Index] = point4( 0.0, 0.0,   step, 1.0);
+		colors[Index] = color4( 0.0, 0.0, 0.0, 1.0);
 
+
+		Index++;
+
+	}
+
+
+	cout << Index << endl;
 
 
 
@@ -282,10 +293,10 @@ void init( Shader s )
 		glBindTexture(GL_TEXTURE_2D, texture); // use the specified ID
 
 		// set the texture wrapping/filtering options (on the currently bound texture object)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
 
