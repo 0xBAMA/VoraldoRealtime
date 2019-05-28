@@ -288,7 +288,9 @@ void init( Shader s )
 
 		// load and generate the texture
 		int width, height, nrChannels;
-		unsigned char *data = stbi_load("big grid.png", &width, &height, &nrChannels, 0);
+		// unsigned char *data = stbi_load("big grid.png", &width, &height, &nrChannels, 0);
+		unsigned char *data = stbi_load("save.png", &width, &height, &nrChannels, 0);
+
 		if (data)
 		{
 		    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 256, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

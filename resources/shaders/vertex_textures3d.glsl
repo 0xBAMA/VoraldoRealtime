@@ -44,7 +44,7 @@ void main()
     color = vColor;
 
 
-    TexCoord = vec3( 0.5 * (vPosition.x + 1.0), 1 * (vPosition.y + 0.5), 1 *(vPosition.z + 0.5));
+    TexCoord = vec3( 1* 0.5 * (vPosition.x + 1.0), 1* 1 * (vPosition.y + 0.5), 1* 1 *(vPosition.z + 0.5));
 
     gl_Position = view * rz * ry * rx * vPosition;
 }
